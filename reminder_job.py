@@ -6,6 +6,9 @@ import os
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
+import psycopg
+from psycopg.rows import dict_row
+
 
 # =========================================
 # 基本設定
@@ -36,6 +39,45 @@ load_dotenv(
 )
 
 
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+)
+
+
+# =========================================
+# PostgreSQLかどうか
+# =========================================
+
+def use_postgres():
+
+    return bool(
+        DATABASE_URL
+    )
+
+
+# =========================================
+# DB接続
+# =========================================
+
+def get_db():
+
+    if use_postgres():
+
+        return psycopg.connect(
+            DATABASE_URL,
+            row_factory=dict_row
+        )
+
+
+    conn = sqlite3.connect(
+        DB_PATH
+    )
+
+    conn.row_factory = sqlite3.Row
+
+    return conn
+
+
 # =========================================
 # ログ
 # =========================================
@@ -55,15 +97,20 @@ def write_log(message):
         end=""
     )
 
-    with open(
-        LOG_PATH,
-        "a",
-        encoding="utf-8"
-    ) as file:
 
-        file.write(
-            text
-        )
+    # Renderではファイルログに依存せず
+    # コンソールログを基本とする
+    if not use_postgres():
+
+        with open(
+            LOG_PATH,
+            "a",
+            encoding="utf-8"
+        ) as file:
+
+            file.write(
+                text
+            )
 
 
 # =========================================
@@ -93,7 +140,6 @@ def parse_deadline(value):
             )
 
 
-            # 古い日付だけのデータ
             if fmt == "%Y-%m-%d":
 
                 parsed = parsed.replace(
@@ -124,6 +170,7 @@ def format_deadline(value):
     )
 
     if not parsed:
+
         return ""
 
     return parsed.strftime(
@@ -142,6 +189,7 @@ def get_remaining_info(value):
     )
 
     if not target:
+
         return None
 
 
@@ -168,9 +216,7 @@ def get_remaining_info(value):
 
     if total_seconds < 60:
 
-        text = (
-            "あと1分未満"
-        )
+        text = "あと1分未満"
 
 
     elif total_seconds < 3600:
@@ -248,6 +294,7 @@ def get_remaining_info(value):
 def intern_days_left(value):
 
     if not value:
+
         return None
 
 
@@ -452,10 +499,6 @@ def send_email(reminder_list):
         )
 
 
-    # =====================================
-    # メール本文
-    # =====================================
-
     body = ""
 
     body += (
@@ -504,48 +547,34 @@ def send_email(reminder_list):
     )
 
 
-    # =====================================
-    # メール作成
-    # =====================================
-
     message = EmailMessage()
-
 
     message["Subject"] = (
         "【就活管理】今日のリマインド"
     )
 
-
     message["From"] = (
         gmail_address
     )
 
-
     message["To"] = (
         reminder_email
     )
-
 
     message.set_content(
         body
     )
 
 
-    # =====================================
-    # Gmail送信
-    # =====================================
-
     with smtplib.SMTP_SSL(
         "smtp.gmail.com",
         465
     ) as server:
 
-
         server.login(
             gmail_address,
             gmail_app_password
         )
-
 
         server.send_message(
             message
@@ -565,13 +594,7 @@ def main():
 
     try:
 
-        conn = sqlite3.connect(
-            DB_PATH
-        )
-
-        conn.row_factory = (
-            sqlite3.Row
-        )
+        conn = get_db()
 
 
         companies = conn.execute(

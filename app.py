@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, redirect, flash
 import sqlite3
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 import smtplib
 import os
 
 from email.message import EmailMessage
 from dotenv import load_dotenv
+
+import psycopg
+from psycopg.rows import dict_row
 
 
 # =========================================
@@ -31,6 +34,12 @@ load_dotenv(
 )
 
 
+# RenderではDATABASE_URLを設定する
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+)
+
+
 app = Flask(__name__)
 
 app.secret_key = os.getenv(
@@ -40,11 +49,34 @@ app.secret_key = os.getenv(
 
 
 # =========================================
+# PostgreSQLかどうか
+# =========================================
+
+def use_postgres():
+
+    return bool(
+        DATABASE_URL
+    )
+
+
+# =========================================
 # データベース接続
 # =========================================
 
 def get_db():
 
+    # Render / PostgreSQL
+    if use_postgres():
+
+        conn = psycopg.connect(
+            DATABASE_URL,
+            row_factory=dict_row
+        )
+
+        return conn
+
+
+    # PC / SQLite
     conn = sqlite3.connect(
         DB_PATH
     )
@@ -55,6 +87,31 @@ def get_db():
 
 
 # =========================================
+# SQL実行
+# =========================================
+
+def db_execute(
+    conn,
+    query,
+    params=()
+):
+
+    # PostgreSQLでは
+    # ? ではなく %s を使用する
+    if use_postgres():
+
+        query = query.replace(
+            "?",
+            "%s"
+        )
+
+    return conn.execute(
+        query,
+        params
+    )
+
+
+# =========================================
 # データベース初期化
 # =========================================
 
@@ -62,20 +119,50 @@ def init_db():
 
     conn = get_db()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS companies (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            company_name TEXT NOT NULL,
-            application_type TEXT,
-            intern_date TEXT,
-            es_deadline TEXT,
-            es_status TEXT,
-            spi_deadline TEXT,
-            spi_status TEXT,
-            selection_status TEXT,
-            memo TEXT
-        )
-    """)
+
+    # =====================================
+    # PostgreSQL
+    # =====================================
+
+    if use_postgres():
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS companies (
+                id SERIAL PRIMARY KEY,
+                company_name TEXT NOT NULL,
+                application_type TEXT,
+                intern_date TEXT,
+                es_deadline TEXT,
+                es_status TEXT,
+                spi_deadline TEXT,
+                spi_status TEXT,
+                selection_status TEXT,
+                memo TEXT
+            )
+        """)
+
+
+    # =====================================
+    # SQLite
+    # =====================================
+
+    else:
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS companies (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_name TEXT NOT NULL,
+                application_type TEXT,
+                intern_date TEXT,
+                es_deadline TEXT,
+                es_status TEXT,
+                spi_deadline TEXT,
+                spi_status TEXT,
+                selection_status TEXT,
+                memo TEXT
+            )
+        """)
+
 
     conn.commit()
     conn.close()
@@ -90,11 +177,13 @@ def parse_deadline(value):
     if not value:
         return None
 
+
     formats = [
         "%Y-%m-%dT%H:%M",
         "%Y-%m-%d %H:%M",
         "%Y-%m-%d"
     ]
+
 
     for fmt in formats:
 
@@ -105,8 +194,9 @@ def parse_deadline(value):
                 fmt
             )
 
-            # 古い「日付だけ」のデータは
-            # その日の23:59として扱う
+
+            # 古い日付のみのデータは
+            # 23:59として扱う
             if fmt == "%Y-%m-%d":
 
                 parsed = parsed.replace(
@@ -114,16 +204,20 @@ def parse_deadline(value):
                     minute=59
                 )
 
+
             return parsed
 
+
         except ValueError:
+
             continue
+
 
     return None
 
 
 # =========================================
-# datetime-local用に変換
+# datetime-local用
 # =========================================
 
 def to_datetime_local(value):
@@ -171,13 +265,21 @@ def get_remaining_info(value):
     if not target:
         return None
 
+
     now = datetime.now()
 
-    difference = target - now
+    difference = (
+        target - now
+    )
 
     total_seconds = int(
         difference.total_seconds()
     )
+
+
+    # =====================================
+    # 期限切れ
+    # =====================================
 
     if total_seconds < 0:
 
@@ -188,13 +290,19 @@ def get_remaining_info(value):
         }
 
 
+    # =====================================
     # 1分未満
+    # =====================================
+
     if total_seconds < 60:
 
         text = "あと1分未満"
 
 
+    # =====================================
     # 1時間未満
+    # =====================================
+
     elif total_seconds < 3600:
 
         minutes = (
@@ -206,7 +314,10 @@ def get_remaining_info(value):
         )
 
 
+    # =====================================
     # 1日未満
+    # =====================================
+
     elif total_seconds < 86400:
 
         hours = (
@@ -216,6 +327,7 @@ def get_remaining_info(value):
         minutes = (
             total_seconds % 3600
         ) // 60
+
 
         if minutes > 0:
 
@@ -231,7 +343,10 @@ def get_remaining_info(value):
             )
 
 
+    # =====================================
     # 1日以上
+    # =====================================
+
     else:
 
         days = (
@@ -241,6 +356,7 @@ def get_remaining_info(value):
         hours = (
             total_seconds % 86400
         ) // 3600
+
 
         if hours > 0:
 
@@ -272,6 +388,7 @@ def intern_days_left(value):
     if not value:
         return None
 
+
     try:
 
         intern_date = datetime.strptime(
@@ -285,12 +402,14 @@ def intern_days_left(value):
             intern_date - today
         ).days
 
+
     except ValueError:
+
         return None
 
 
 # =========================================
-# リマインド一覧作成
+# リマインド一覧
 # =========================================
 
 def make_reminder_list(companies):
@@ -307,12 +426,12 @@ def make_reminder_list(companies):
 
         # =================================
         # ES
-        # 締切まで72時間以内
         # =================================
 
         es_info = get_remaining_info(
             company["es_deadline"]
         )
+
 
         if (
             company["es_status"] != "提出済"
@@ -322,24 +441,35 @@ def make_reminder_list(companies):
         ):
 
             reminder_list.append({
-                "company_name": company["company_name"],
-                "type": "ES",
-                "date": format_deadline(
-                    company["es_deadline"]
-                ),
-                "seconds": es_info["seconds"],
-                "remaining_text": es_info["text"]
+
+                "company_name":
+                    company["company_name"],
+
+                "type":
+                    "ES",
+
+                "date":
+                    format_deadline(
+                        company["es_deadline"]
+                    ),
+
+                "seconds":
+                    es_info["seconds"],
+
+                "remaining_text":
+                    es_info["text"]
+
             })
 
 
         # =================================
         # SPI
-        # 締切まで72時間以内
         # =================================
 
         spi_info = get_remaining_info(
             company["spi_deadline"]
         )
+
 
         if (
             company["spi_status"] != "受験済"
@@ -349,24 +479,35 @@ def make_reminder_list(companies):
         ):
 
             reminder_list.append({
-                "company_name": company["company_name"],
-                "type": "SPI",
-                "date": format_deadline(
-                    company["spi_deadline"]
-                ),
-                "seconds": spi_info["seconds"],
-                "remaining_text": spi_info["text"]
+
+                "company_name":
+                    company["company_name"],
+
+                "type":
+                    "SPI",
+
+                "date":
+                    format_deadline(
+                        company["spi_deadline"]
+                    ),
+
+                "seconds":
+                    spi_info["seconds"],
+
+                "remaining_text":
+                    spi_info["text"]
+
             })
 
 
         # =================================
         # インターン
-        # 今日・明日
         # =================================
 
         intern_days = intern_days_left(
             company["intern_date"]
         )
+
 
         if (
             intern_days is not None
@@ -383,17 +524,29 @@ def make_reminder_list(companies):
 
 
             reminder_list.append({
-                "company_name": company["company_name"],
-                "type": "インターン",
-                "date": company["intern_date"],
-                "seconds": intern_days * 86400,
-                "remaining_text": remaining_text
+
+                "company_name":
+                    company["company_name"],
+
+                "type":
+                    "インターン",
+
+                "date":
+                    company["intern_date"],
+
+                "seconds":
+                    intern_days * 86400,
+
+                "remaining_text":
+                    remaining_text
+
             })
 
 
     reminder_list.sort(
         key=lambda item: item["seconds"]
     )
+
 
     return reminder_list
 
@@ -429,7 +582,7 @@ def send_reminder_email(reminder_list):
 
         return (
             False,
-            "GMAIL_ADDRESSが.envに設定されていません。"
+            "GMAIL_ADDRESSが設定されていません。"
         )
 
 
@@ -437,7 +590,7 @@ def send_reminder_email(reminder_list):
 
         return (
             False,
-            "GMAIL_APP_PASSWORDが.envに設定されていません。"
+            "GMAIL_APP_PASSWORDが設定されていません。"
         )
 
 
@@ -445,7 +598,7 @@ def send_reminder_email(reminder_list):
 
         return (
             False,
-            "REMINDER_EMAILが.envに設定されていません。"
+            "REMINDER_EMAILが設定されていません。"
         )
 
 
@@ -456,10 +609,6 @@ def send_reminder_email(reminder_list):
             "現在リマインド対象の予定はありません。"
         )
 
-
-    # =====================================
-    # メール本文
-    # =====================================
 
     body = ""
 
@@ -508,10 +657,6 @@ def send_reminder_email(reminder_list):
     )
 
 
-    # =====================================
-    # メール作成
-    # =====================================
-
     message = EmailMessage()
 
     message["Subject"] = (
@@ -530,10 +675,6 @@ def send_reminder_email(reminder_list):
         body
     )
 
-
-    # =====================================
-    # Gmail送信
-    # =====================================
 
     try:
 
@@ -567,7 +708,7 @@ def send_reminder_email(reminder_list):
 
         return (
             False,
-            "メール送信に失敗しました。ターミナルのエラーを確認してください。"
+            "メール送信に失敗しました。"
         )
 
 
@@ -676,13 +817,15 @@ def home():
     )
 
 
-    companies = conn.execute(
+    companies = db_execute(
+        conn,
         query,
         params
     ).fetchall()
 
 
-    all_companies = conn.execute(
+    all_companies = db_execute(
+        conn,
         """
         SELECT *
         FROM companies
@@ -726,7 +869,7 @@ def home():
 
 
     # =====================================
-    # 表示用データ
+    # 一覧表示用データ
     # =====================================
 
     company_list = []
@@ -812,7 +955,7 @@ def home():
 
 
 # =========================================
-# メール送信
+# メール手動送信
 # =========================================
 
 @app.route(
@@ -823,7 +966,8 @@ def send_reminder():
 
     conn = get_db()
 
-    companies = conn.execute(
+    companies = db_execute(
+        conn,
         """
         SELECT *
         FROM companies
@@ -915,7 +1059,9 @@ def add_company():
         conn = get_db()
 
 
-        conn.execute("""
+        db_execute(
+            conn,
+            """
             INSERT INTO companies (
                 company_name,
                 application_type,
@@ -927,33 +1073,23 @@ def add_company():
                 selection_status,
                 memo
             )
-
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-
-            company_name,
-
-            application_type,
-
-            intern_date,
-
-            es_deadline,
-
-            es_status,
-
-            spi_deadline,
-
-            spi_status,
-
-            selection_status,
-
-            memo
-
-        ))
+            """,
+            (
+                company_name,
+                application_type,
+                intern_date,
+                es_deadline,
+                es_status,
+                spi_deadline,
+                spi_status,
+                selection_status,
+                memo
+            )
+        )
 
 
         conn.commit()
-
         conn.close()
 
 
@@ -1017,9 +1153,10 @@ def edit_company(id):
         ]
 
 
-        conn.execute("""
+        db_execute(
+            conn,
+            """
             UPDATE companies
-
             SET
                 company_name = ?,
                 application_type = ?,
@@ -1030,42 +1167,32 @@ def edit_company(id):
                 spi_status = ?,
                 selection_status = ?,
                 memo = ?
-
             WHERE id = ?
-        """, (
-
-            company_name,
-
-            application_type,
-
-            intern_date,
-
-            es_deadline,
-
-            es_status,
-
-            spi_deadline,
-
-            spi_status,
-
-            selection_status,
-
-            memo,
-
-            id
-
-        ))
+            """,
+            (
+                company_name,
+                application_type,
+                intern_date,
+                es_deadline,
+                es_status,
+                spi_deadline,
+                spi_status,
+                selection_status,
+                memo,
+                id
+            )
+        )
 
 
         conn.commit()
-
         conn.close()
 
 
         return redirect("/")
 
 
-    company = conn.execute(
+    company = db_execute(
+        conn,
         """
         SELECT *
         FROM companies
@@ -1176,7 +1303,8 @@ def update_status(id):
     conn = get_db()
 
 
-    conn.execute(
+    db_execute(
+        conn,
         f"""
         UPDATE companies
         SET {field} = ?
@@ -1190,7 +1318,6 @@ def update_status(id):
 
 
     conn.commit()
-
     conn.close()
 
 
@@ -1212,7 +1339,8 @@ def delete_company(id):
     conn = get_db()
 
 
-    conn.execute(
+    db_execute(
+        conn,
         """
         DELETE FROM companies
         WHERE id = ?
@@ -1222,7 +1350,6 @@ def delete_company(id):
 
 
     conn.commit()
-
     conn.close()
 
 
@@ -1230,12 +1357,19 @@ def delete_company(id):
 
 
 # =========================================
-# 起動
+# DB初期化
+#
+# gunicornで起動した場合も実行される
+# =========================================
+
+init_db()
+
+
+# =========================================
+# PCから直接起動
 # =========================================
 
 if __name__ == "__main__":
-
-    init_db()
 
     app.run(
         debug=True
