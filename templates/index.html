@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        就活管理アプリ
+    </title>
+
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+
+        .container {
+            width: 95%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 30px 0;
+        }
+
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+
+        .add-button {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+
+
+        .mail-button {
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+
+        .flash-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+
+        .flash-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            min-width: 180px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+
+        .card-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+
+        .search-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+
+        .search-form input,
+        .search-form select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+
+        .search-button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        .clear-button {
+            text-decoration: none;
+            background-color: #6b7280;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+
+        .warning-box {
+            background-color: white;
+            border-left: 5px solid #ef4444;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+
+        .warning-item {
+            margin: 10px 0;
+        }
+
+
+        .urgent {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+
+        .complete {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+
+        .table-box {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1300px;
+        }
+
+
+        th {
+            background-color: #1f2937;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+
+        .status-select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+
+        .status-help {
+            color: #777;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+
+        .edit-button {
+            background-color: #f59e0b;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        .delete-button {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+
+        .action-box {
+            display: flex;
+            gap: 5px;
+        }
+
+
+        .deadline-time {
+            font-weight: bold;
+        }
+
+
+        .remaining {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        就活管理アプリ
+    </h1>
+
+
+    <p class="subtitle">
+        インターン・ES・SPI・選考状況をまとめて管理
+    </p>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                {% if category == "success" %}
+
+                    <div class="flash-success">
+                        {{ message }}
+                    </div>
+
+                {% else %}
+
+                    <div class="flash-error">
+                        {{ message }}
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="top-buttons">
+
+
+        <a
+            href="/add"
+            class="add-button"
+        >
+            ＋ 企業を追加
+        </a>
+
+
+        <form
+            method="POST"
+            action="/send_reminder"
+        >
+
+            <button
+                type="submit"
+                class="mail-button"
+            >
+                ✉ リマインドメールを送信
+            </button>
+
+        </form>
+
+
+    </div>
+
+
+    <div class="cards">
+
+
+        <div class="card">
+
+            <div class="card-title">
+                応募企業
+            </div>
+
+            <div class="card-number">
+                {{ total_count }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                ES未提出
+            </div>
+
+            <div class="card-number">
+                {{ es_not_submitted_count }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                SPI未受験
+            </div>
+
+            <div class="card-number">
+                {{ spi_not_taken_count }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                選考中
+            </div>
+
+            <div class="card-number">
+                {{ selection_count }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="search-box">
+
+
+        <h2>
+            検索・絞り込み
+        </h2>
+
+
+        <form
+            method="GET"
+            action="/"
+            class="search-form"
+        >
+
+
+            <input
+                type="text"
+                name="keyword"
+                placeholder="企業名で検索"
+                value="{{ keyword }}"
+            >
+
+
+            <select name="application_type">
+
+                <option value="">
+                    応募区分：すべて
+                </option>
+
+                <option
+                    value="インターン"
+                    {% if application_type == "インターン" %}
+                    selected
+                    {% endif %}
+                >
+                    インターン
+                </option>
+
+                <option
+                    value="本選考"
+                    {% if application_type == "本選考" %}
+                    selected
+                    {% endif %}
+                >
+                    本選考
+                </option>
+
+            </select>
+
+
+            <select name="es_status">
+
+                <option value="">
+                    ES：すべて
+                </option>
+
+                <option
+                    value="未提出"
+                    {% if es_status == "未提出" %}
+                    selected
+                    {% endif %}
+                >
+                    ES未提出
+                </option>
+
+                <option
+                    value="提出済"
+                    {% if es_status == "提出済" %}
+                    selected
+                    {% endif %}
+                >
+                    ES提出済
+                </option>
+
+            </select>
+
+
+            <select name="spi_status">
+
+                <option value="">
+                    SPI：すべて
+                </option>
+
+                <option
+                    value="未受験"
+                    {% if spi_status == "未受験" %}
+                    selected
+                    {% endif %}
+                >
+                    SPI未受験
+                </option>
+
+                <option
+                    value="受験済"
+                    {% if spi_status == "受験済" %}
+                    selected
+                    {% endif %}
+                >
+                    SPI受験済
+                </option>
+
+            </select>
+
+
+            <select name="selection_status">
+
+                <option value="">
+                    選考状況：すべて
+                </option>
+
+                <option
+                    value="応募前"
+                    {% if selection_status == "応募前" %}
+                    selected
+                    {% endif %}
+                >
+                    応募前
+                </option>
+
+                <option
+                    value="応募済"
+                    {% if selection_status == "応募済" %}
+                    selected
+                    {% endif %}
+                >
+                    応募済
+                </option>
+
+                <option
+                    value="選考中"
+                    {% if selection_status == "選考中" %}
+                    selected
+                    {% endif %}
+                >
+                    選考中
+                </option>
+
+                <option
+                    value="合格"
+                    {% if selection_status == "合格" %}
+                    selected
+                    {% endif %}
+                >
+                    合格
+                </option>
+
+                <option
+                    value="不合格"
+                    {% if selection_status == "不合格" %}
+                    selected
+                    {% endif %}
+                >
+                    不合格
+                </option>
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="search-button"
+            >
+                検索
+            </button>
+
+
+            <a
+                href="/"
+                class="clear-button"
+            >
+                条件をクリア
+            </a>
+
+
+        </form>
+
+
+    </div>
+
+
+    <div class="warning-box">
+
+
+        <h2>
+            🔔 リマインド
+        </h2>
+
+
+        {% if urgent_list %}
+
+
+            {% for item in urgent_list %}
+
+
+                <div class="warning-item">
+
+                    <strong>
+                        {{ item.company_name }}
+                    </strong>
+
+                    /
+
+                    {{ item.type }}
+
+                    /
+
+                    {{ item.date }}
+
+                    /
+
+                    <span class="urgent">
+                        {{ item.remaining_text }}
+                    </span>
+
+                </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <p>
+                現在、リマインド対象はありません。
+            </p>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <h2>
+        応募企業一覧
+    </h2>
+
+
+    <div class="table-box">
+
+
+        <table>
+
+
+            <tr>
+
+                <th>企業名</th>
+
+                <th>応募区分</th>
+
+                <th>インターン開催日</th>
+
+                <th>ES締切</th>
+
+                <th>ES状況</th>
+
+                <th>SPI締切</th>
+
+                <th>SPI状況</th>
+
+                <th>選考状況</th>
+
+                <th>メモ</th>
+
+                <th>操作</th>
+
+            </tr>
+
+
+            {% for company in companies %}
+
+
+            <tr>
+
+
+                <td>
+
+                    <strong>
+                        {{ company.company_name }}
+                    </strong>
+
+                </td>
+
+
+                <td>
+                    {{ company.application_type }}
+                </td>
+
+
+                <td>
+
+                    {% if company.intern_date %}
+
+                        {{ company.intern_date }}
+
+                        {% if company.intern_days == 0 %}
+
+                            <br>
+
+                            <span class="urgent">
+                                今日
+                            </span>
+
+                        {% elif company.intern_days == 1 %}
+
+                            <br>
+
+                            <span class="urgent">
+                                明日
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if company.es_deadline %}
+
+
+                        <div class="deadline-time">
+                            {{ company.es_display }}
+                        </div>
+
+
+                        {% if company.es_status == "提出済" %}
+
+                            <div class="remaining complete">
+                                完了
+                            </div>
+
+                        {% elif company.es_remaining %}
+
+                            {% if company.es_remaining.expired %}
+
+                                <div class="remaining urgent">
+                                    期限切れ
+                                </div>
+
+                            {% else %}
+
+                                <div class="remaining urgent">
+                                    {{ company.es_remaining.text }}
+                                </div>
+
+                            {% endif %}
+
+                        {% endif %}
+
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <form
+                        method="POST"
+                        action="/update_status/{{ company.id }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="field"
+                            value="es_status"
+                        >
+
+                        <select
+                            name="value"
+                            class="status-select"
+                            onchange="this.form.submit()"
+                        >
+
+                            <option
+                                value="未提出"
+                                {% if company.es_status == "未提出" %}
+                                selected
+                                {% endif %}
+                            >
+                                未提出
+                            </option>
+
+                            <option
+                                value="提出済"
+                                {% if company.es_status == "提出済" %}
+                                selected
+                                {% endif %}
+                            >
+                                提出済
+                            </option>
+
+                        </select>
+
+                    </form>
+
+                    <div class="status-help">
+                        変更すると自動保存
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    {% if company.spi_deadline %}
+
+
+                        <div class="deadline-time">
+                            {{ company.spi_display }}
+                        </div>
+
+
+                        {% if company.spi_status == "受験済" %}
+
+                            <div class="remaining complete">
+                                完了
+                            </div>
+
+                        {% elif company.spi_remaining %}
+
+                            {% if company.spi_remaining.expired %}
+
+                                <div class="remaining urgent">
+                                    期限切れ
+                                </div>
+
+                            {% else %}
+
+                                <div class="remaining urgent">
+                                    {{ company.spi_remaining.text }}
+                                </div>
+
+                            {% endif %}
+
+                        {% endif %}
+
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <form
+                        method="POST"
+                        action="/update_status/{{ company.id }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="field"
+                            value="spi_status"
+                        >
+
+                        <select
+                            name="value"
+                            class="status-select"
+                            onchange="this.form.submit()"
+                        >
+
+                            <option
+                                value="未受験"
+                                {% if company.spi_status == "未受験" %}
+                                selected
+                                {% endif %}
+                            >
+                                未受験
+                            </option>
+
+                            <option
+                                value="受験済"
+                                {% if company.spi_status == "受験済" %}
+                                selected
+                                {% endif %}
+                            >
+                                受験済
+                            </option>
+
+                        </select>
+
+                    </form>
+
+                    <div class="status-help">
+                        変更すると自動保存
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    <form
+                        method="POST"
+                        action="/update_status/{{ company.id }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="field"
+                            value="selection_status"
+                        >
+
+                        <select
+                            name="value"
+                            class="status-select"
+                            onchange="this.form.submit()"
+                        >
+
+                            <option
+                                value="応募前"
+                                {% if company.selection_status == "応募前" %}
+                                selected
+                                {% endif %}
+                            >
+                                応募前
+                            </option>
+
+                            <option
+                                value="応募済"
+                                {% if company.selection_status == "応募済" %}
+                                selected
+                                {% endif %}
+                            >
+                                応募済
+                            </option>
+
+                            <option
+                                value="選考中"
+                                {% if company.selection_status == "選考中" %}
+                                selected
+                                {% endif %}
+                            >
+                                選考中
+                            </option>
+
+                            <option
+                                value="合格"
+                                {% if company.selection_status == "合格" %}
+                                selected
+                                {% endif %}
+                            >
+                                合格
+                            </option>
+
+                            <option
+                                value="不合格"
+                                {% if company.selection_status == "不合格" %}
+                                selected
+                                {% endif %}
+                            >
+                                不合格
+                            </option>
+
+                        </select>
+
+                    </form>
+
+                    <div class="status-help">
+                        変更すると自動保存
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    {% if company.memo %}
+
+                        {{ company.memo }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <div class="action-box">
+
+
+                        <a href="/edit/{{ company.id }}">
+
+                            <button
+                                type="button"
+                                class="edit-button"
+                            >
+                                編集
+                            </button>
+
+                        </a>
+
+
+                        <form
+                            action="/delete/{{ company.id }}"
+                            method="POST"
+                        >
+
+                            <button
+                                type="submit"
+                                class="delete-button"
+                                onclick="return confirm('本当に削除しますか？');"
+                            >
+                                削除
+                            </button>
+
+                        </form>
+
+
+                    </div>
+
+                </td>
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+            {% if companies | length == 0 %}
+
+
+            <tr>
+
+                <td
+                    colspan="10"
+                    style="text-align:center;"
+                >
+                    条件に一致する企業がありません。
+                </td>
+
+            </tr>
+
+
+            {% endif %}
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

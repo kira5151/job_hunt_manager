@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        企業情報編集
+    </title>
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+        }
+
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        h1 {
+            margin-top: 0;
+        }
+
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+
+        textarea {
+            resize: vertical;
+        }
+
+
+        .submit-button {
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+
+        .back-button {
+            display: inline-block;
+            margin-left: 10px;
+            text-decoration: none;
+            background-color: #6b7280;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 8px;
+        }
+
+
+        .help {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        企業情報を編集
+    </h1>
+
+
+    <form method="POST">
+
+
+        <div class="form-group">
+
+            <label>
+                企業名
+            </label>
+
+            <input
+                type="text"
+                name="company_name"
+                value="{{ company.company_name }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                応募区分
+            </label>
+
+            <select name="application_type">
+
+                <option
+                    value="インターン"
+                    {% if company.application_type == "インターン" %}
+                    selected
+                    {% endif %}
+                >
+                    インターン
+                </option>
+
+                <option
+                    value="本選考"
+                    {% if company.application_type == "本選考" %}
+                    selected
+                    {% endif %}
+                >
+                    本選考
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                インターン開催日
+            </label>
+
+            <input
+                type="date"
+                name="intern_date"
+                value="{{ company.intern_date }}"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                ES締切
+            </label>
+
+            <input
+                type="datetime-local"
+                name="es_deadline"
+                value="{{ company.es_deadline_input }}"
+            >
+
+            <div class="help">
+                日付と締切時刻を設定できます
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                ES提出状況
+            </label>
+
+            <select name="es_status">
+
+                <option
+                    value="未提出"
+                    {% if company.es_status == "未提出" %}
+                    selected
+                    {% endif %}
+                >
+                    未提出
+                </option>
+
+                <option
+                    value="提出済"
+                    {% if company.es_status == "提出済" %}
+                    selected
+                    {% endif %}
+                >
+                    提出済
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                SPI締切
+            </label>
+
+            <input
+                type="datetime-local"
+                name="spi_deadline"
+                value="{{ company.spi_deadline_input }}"
+            >
+
+            <div class="help">
+                日付と締切時刻を設定できます
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                SPI受験状況
+            </label>
+
+            <select name="spi_status">
+
+                <option
+                    value="未受験"
+                    {% if company.spi_status == "未受験" %}
+                    selected
+                    {% endif %}
+                >
+                    未受験
+                </option>
+
+                <option
+                    value="受験済"
+                    {% if company.spi_status == "受験済" %}
+                    selected
+                    {% endif %}
+                >
+                    受験済
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                選考状況
+            </label>
+
+            <select name="selection_status">
+
+                <option
+                    value="応募前"
+                    {% if company.selection_status == "応募前" %}
+                    selected
+                    {% endif %}
+                >
+                    応募前
+                </option>
+
+                <option
+                    value="応募済"
+                    {% if company.selection_status == "応募済" %}
+                    selected
+                    {% endif %}
+                >
+                    応募済
+                </option>
+
+                <option
+                    value="選考中"
+                    {% if company.selection_status == "選考中" %}
+                    selected
+                    {% endif %}
+                >
+                    選考中
+                </option>
+
+                <option
+                    value="合格"
+                    {% if company.selection_status == "合格" %}
+                    selected
+                    {% endif %}
+                >
+                    合格
+                </option>
+
+                <option
+                    value="不合格"
+                    {% if company.selection_status == "不合格" %}
+                    selected
+                    {% endif %}
+                >
+                    不合格
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                メモ
+            </label>
+
+            <textarea
+                name="memo"
+                rows="5"
+            >{{ company.memo }}</textarea>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="submit-button"
+        >
+            更新
+        </button>
+
+
+        <a
+            href="/"
+            class="back-button"
+        >
+            トップに戻る
+        </a>
+
+
+    </form>
+
+
+</div>
+
+
+</body>
+
+</html>
