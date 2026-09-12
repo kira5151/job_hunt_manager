@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html lang="ja">
-
 <head>
 
     <meta charset="UTF-8">
@@ -279,6 +277,204 @@
         .remaining {
             margin-top: 5px;
             font-size: 14px;
+        }
+
+
+        /* =========================================
+           スマホ用カード
+        ========================================= */
+
+        .mobile-company-list {
+            display: none;
+        }
+
+
+        .mobile-company-card {
+            background-color: white;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .mobile-company-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 14px;
+        }
+
+
+        .mobile-row {
+            margin-bottom: 14px;
+        }
+
+
+        .mobile-label {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 4px;
+        }
+
+
+        .mobile-value {
+            font-size: 15px;
+        }
+
+
+        .mobile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+
+        .mobile-actions a,
+        .mobile-actions form {
+            flex: 1;
+        }
+
+
+        .mobile-actions button {
+            width: 100%;
+            padding: 11px;
+            font-size: 15px;
+        }
+
+
+        /* =========================================
+           スマホ表示
+        ========================================= */
+
+        @media (max-width: 768px) {
+
+            .container {
+                width: 92%;
+                padding: 20px 0;
+            }
+
+
+            h1 {
+                font-size: 24px;
+            }
+
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+
+            .top-buttons {
+                flex-direction: column;
+            }
+
+
+            .top-buttons a,
+            .top-buttons form {
+                width: 100%;
+            }
+
+
+            .add-button,
+            .mail-button {
+                width: 100%;
+                box-sizing: border-box;
+                text-align: center;
+            }
+
+
+            .cards {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+
+            .card {
+                min-width: 0;
+                padding: 15px;
+            }
+
+
+            .card-number {
+                font-size: 26px;
+            }
+
+
+            .search-box {
+                padding: 15px;
+            }
+
+
+            .search-form {
+                flex-direction: column;
+            }
+
+
+            .search-form input,
+            .search-form select,
+            .search-button,
+            .clear-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+
+            .clear-button {
+                text-align: center;
+            }
+
+
+            .warning-box {
+                padding: 15px;
+            }
+
+
+            .warning-item {
+                line-height: 1.6;
+            }
+
+
+            .table-box {
+                display: none;
+            }
+
+
+            .mobile-company-list {
+                display: block;
+            }
+
+
+            .status-select {
+                width: 100%;
+                padding: 10px;
+                font-size: 15px;
+            }
+
+
+            .status-help {
+                font-size: 11px;
+            }
+
+        }
+
+
+        @media (max-width: 420px) {
+
+            .cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+
+            .card-title {
+                font-size: 12px;
+            }
+
+
+            .card-number {
+                font-size: 24px;
+            }
+
         }
 
 
@@ -656,6 +852,10 @@
     </h2>
 
 
+    <!-- =====================================
+         PC用テーブル
+    ====================================== -->
+
     <div class="table-box">
 
 
@@ -665,23 +865,14 @@
             <tr>
 
                 <th>企業名</th>
-
                 <th>応募区分</th>
-
                 <th>インターン開催日</th>
-
                 <th>ES締切</th>
-
                 <th>ES状況</th>
-
                 <th>SPI締切</th>
-
                 <th>SPI状況</th>
-
                 <th>選考状況</th>
-
                 <th>メモ</th>
-
                 <th>操作</th>
 
             </tr>
@@ -694,11 +885,9 @@
 
 
                 <td>
-
                     <strong>
                         {{ company.company_name }}
                     </strong>
-
                 </td>
 
 
@@ -716,7 +905,6 @@
                         {% if company.intern_days == 0 %}
 
                             <br>
-
                             <span class="urgent">
                                 今日
                             </span>
@@ -724,7 +912,6 @@
                         {% elif company.intern_days == 1 %}
 
                             <br>
-
                             <span class="urgent">
                                 明日
                             </span>
@@ -744,11 +931,9 @@
 
                     {% if company.es_deadline %}
 
-
                         <div class="deadline-time">
                             {{ company.es_display }}
                         </div>
-
 
                         {% if company.es_status == "提出済" %}
 
@@ -773,7 +958,6 @@
                             {% endif %}
 
                         {% endif %}
-
 
                     {% else %}
 
@@ -825,10 +1009,6 @@
 
                     </form>
 
-                    <div class="status-help">
-                        変更すると自動保存
-                    </div>
-
                 </td>
 
 
@@ -836,11 +1016,9 @@
 
                     {% if company.spi_deadline %}
 
-
                         <div class="deadline-time">
                             {{ company.spi_display }}
                         </div>
-
 
                         {% if company.spi_status == "受験済" %}
 
@@ -865,7 +1043,6 @@
                             {% endif %}
 
                         {% endif %}
-
 
                     {% else %}
 
@@ -916,10 +1093,6 @@
                         </select>
 
                     </form>
-
-                    <div class="status-help">
-                        変更すると自動保存
-                    </div>
 
                 </td>
 
@@ -992,23 +1165,15 @@
 
                     </form>
 
-                    <div class="status-help">
-                        変更すると自動保存
-                    </div>
-
                 </td>
 
 
                 <td>
 
                     {% if company.memo %}
-
                         {{ company.memo }}
-
                     {% else %}
-
                         -
-
                     {% endif %}
 
                 </td>
@@ -1060,7 +1225,6 @@
 
             {% if companies | length == 0 %}
 
-
             <tr>
 
                 <td
@@ -1072,11 +1236,420 @@
 
             </tr>
 
-
             {% endif %}
 
 
         </table>
+
+
+    </div>
+
+
+    <!-- =====================================
+         スマホ用カード
+    ====================================== -->
+
+    <div class="mobile-company-list">
+
+
+        {% for company in companies %}
+
+
+        <div class="mobile-company-card">
+
+
+            <div class="mobile-company-name">
+                {{ company.company_name }}
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    応募区分
+                </div>
+
+                <div class="mobile-value">
+                    {{ company.application_type }}
+                </div>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    インターン開催日
+                </div>
+
+                <div class="mobile-value">
+
+                    {% if company.intern_date %}
+
+                        {{ company.intern_date }}
+
+                        {% if company.intern_days == 0 %}
+
+                            <span class="urgent">
+                                （今日）
+                            </span>
+
+                        {% elif company.intern_days == 1 %}
+
+                            <span class="urgent">
+                                （明日）
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    ES締切
+                </div>
+
+                <div class="mobile-value">
+
+                    {% if company.es_deadline %}
+
+                        {{ company.es_display }}
+
+                        {% if company.es_status == "提出済" %}
+
+                            <br>
+                            <span class="complete">
+                                完了
+                            </span>
+
+                        {% elif company.es_remaining %}
+
+                            <br>
+
+                            {% if company.es_remaining.expired %}
+
+                                <span class="urgent">
+                                    期限切れ
+                                </span>
+
+                            {% else %}
+
+                                <span class="urgent">
+                                    {{ company.es_remaining.text }}
+                                </span>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    ES状況
+                </div>
+
+                <form
+                    method="POST"
+                    action="/update_status/{{ company.id }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="field"
+                        value="es_status"
+                    >
+
+                    <select
+                        name="value"
+                        class="status-select"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option
+                            value="未提出"
+                            {% if company.es_status == "未提出" %}
+                            selected
+                            {% endif %}
+                        >
+                            未提出
+                        </option>
+
+                        <option
+                            value="提出済"
+                            {% if company.es_status == "提出済" %}
+                            selected
+                            {% endif %}
+                        >
+                            提出済
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    SPI締切
+                </div>
+
+                <div class="mobile-value">
+
+                    {% if company.spi_deadline %}
+
+                        {{ company.spi_display }}
+
+                        {% if company.spi_status == "受験済" %}
+
+                            <br>
+                            <span class="complete">
+                                完了
+                            </span>
+
+                        {% elif company.spi_remaining %}
+
+                            <br>
+
+                            {% if company.spi_remaining.expired %}
+
+                                <span class="urgent">
+                                    期限切れ
+                                </span>
+
+                            {% else %}
+
+                                <span class="urgent">
+                                    {{ company.spi_remaining.text }}
+                                </span>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    SPI状況
+                </div>
+
+                <form
+                    method="POST"
+                    action="/update_status/{{ company.id }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="field"
+                        value="spi_status"
+                    >
+
+                    <select
+                        name="value"
+                        class="status-select"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option
+                            value="未受験"
+                            {% if company.spi_status == "未受験" %}
+                            selected
+                            {% endif %}
+                        >
+                            未受験
+                        </option>
+
+                        <option
+                            value="受験済"
+                            {% if company.spi_status == "受験済" %}
+                            selected
+                            {% endif %}
+                        >
+                            受験済
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    選考状況
+                </div>
+
+                <form
+                    method="POST"
+                    action="/update_status/{{ company.id }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="field"
+                        value="selection_status"
+                    >
+
+                    <select
+                        name="value"
+                        class="status-select"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option
+                            value="応募前"
+                            {% if company.selection_status == "応募前" %}
+                            selected
+                            {% endif %}
+                        >
+                            応募前
+                        </option>
+
+                        <option
+                            value="応募済"
+                            {% if company.selection_status == "応募済" %}
+                            selected
+                            {% endif %}
+                        >
+                            応募済
+                        </option>
+
+                        <option
+                            value="選考中"
+                            {% if company.selection_status == "選考中" %}
+                            selected
+                            {% endif %}
+                        >
+                            選考中
+                        </option>
+
+                        <option
+                            value="合格"
+                            {% if company.selection_status == "合格" %}
+                            selected
+                            {% endif %}
+                        >
+                            合格
+                        </option>
+
+                        <option
+                            value="不合格"
+                            {% if company.selection_status == "不合格" %}
+                            selected
+                            {% endif %}
+                        >
+                            不合格
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+
+            <div class="mobile-row">
+
+                <div class="mobile-label">
+                    メモ
+                </div>
+
+                <div class="mobile-value">
+
+                    {% if company.memo %}
+                        {{ company.memo }}
+                    {% else %}
+                        -
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="mobile-actions">
+
+
+                <a href="/edit/{{ company.id }}">
+
+                    <button
+                        type="button"
+                        class="edit-button"
+                    >
+                        編集
+                    </button>
+
+                </a>
+
+
+                <form
+                    action="/delete/{{ company.id }}"
+                    method="POST"
+                >
+
+                    <button
+                        type="submit"
+                        class="delete-button"
+                        onclick="return confirm('本当に削除しますか？');"
+                    >
+                        削除
+                    </button>
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+        {% if companies | length == 0 %}
+
+            <div class="mobile-company-card">
+                条件に一致する企業がありません。
+            </div>
+
+        {% endif %}
 
 
     </div>
