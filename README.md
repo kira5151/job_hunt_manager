@@ -58,7 +58,7 @@ PythonによるWebアプリケーション開発、SQLiteを用いたデータ�
 
 ### 1. リポジトリを取得
 ```bash
-git clone <リポジトリURL>
+git clone <git clone https://github.com/kira5151/job_hunt_manager.git>
 cd job_hunt_manager
 ```
 
@@ -78,4 +78,22 @@ py app.py
 
 ※ Windows環境を想定しています。
 メール通知機能の利用には別途メール送信設定が必要です。
+  
+
+## システム構成
+
+- **フロントエンド**：HTML、Flaskのテンプレート機能
+- **バックエンド**：Python / Flask
+- **データベース**：SQLite（ローカル）、PostgreSQL（クラウド環境）
+- **通知機能**：Gmail SMTP
+- **定期処理**：Windows タスクスケジューラ
+- **クラウド実行対応**：Gunicorn / Render向け設定
+
+### 技術的な工夫
+
+実行環境に応じてSQLiteとPostgreSQLを切り替えられるよう、データベース接続処理を共通化しました。
+
+SQLの値にはプレースホルダーを使用し、入力値を直接SQL文に連結しない設計にしました。
+
+締切日時を解析して残り時間を計算し、ES・SPIの未完了項目から通知対象を抽出する仕組みを実装しました。
   
